@@ -14,11 +14,11 @@ telegram:
     telegram_format: "{{data}}"
 EOF
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Starting Automation" | notify -silent
+echo "[$(date "+%d-%m-%y %H:%M:%S")] [$DOMAIN] Starting Automation" | notify -silent
 
 ## DNS Enumeration
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] DNS Enumeration Starting" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS Enumeration Starting" | notify -silent
 
 if $DNS_BRUTE
 then
@@ -28,19 +28,19 @@ fi
 theHarvester -d $DOMAIN -s -v -r -n -c | grep "$DOMAIN" | cut -d":" -f1 | anew $LOGDIR/dns.txt > /dev/null
 subfinder -d $DOMAIN -silent | anew $LOGDIR/dns.txt > /dev/null
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] DNS enumeration found $(cat $LOGDIR/dns.txt | wc -l) subdomains" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS enumeration found $(cat $LOGDIR/dns.txt | wc -l) subdomains" | notify -silent
 
 find $LOGDIR/dns.txt -size 0 -print -delete > /dev/null
 
 ## Gau/WaybackURLs
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Gau and Waybackurls Starting" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau and Waybackurls Starting" | notify -silent
 
 gau $DOMAIN | anew $LOGDIR/links.txt > /dev/null
 waybackurls $DOMAIN | anew $LOGDIR/links.txt > /dev/null
 find $LOGDIR/links.txt -size 0 -print -delete > /dev/null
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Gau and Waybackurls found $(cat $LOGDIR/links.txt | wc -l) links" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau and Waybackurls found $(cat $LOGDIR/links.txt | wc -l) links" | notify -silent
 
 ## HTTPX
 
@@ -50,16 +50,16 @@ cat $LOGDIR/dns.txt | httpx -silent | anew $LOGDIR/http_and_https.txt > /dev/nul
 
 if $GOOP
 then
-  echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Starting Git Exposed with Goop" | notify -silent
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Git Exposed with Goop" | notify -silent
 
   mkdir -p $LOGDIR/goop && cd $LOGDIR/goop
   cat $LOGDIR/http_and_https.txt | cut -d"/" -f3 | xargs -I@ sh -c 'goop @' > /dev/null
-  echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Goop found $(ls -1 $LOGDIR/goop | wc -l) probable repositories" | notify -silent
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Goop found $(ls -1 $LOGDIR/goop | wc -l) probable repositories" | notify -silent
 fi
 
 ## Nuclei
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Starting Nuclei" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Nuclei" | notify -silent
 
 nuclei -list $LOGDIR/links.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent | notify -silent |& tee -a $LOGDIR/nuclei.txt
 nuclei -list $LOGDIR/http_and_https.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent | notify -silent |& tee -a $LOGDIR/nuclei.txt
@@ -67,4 +67,4 @@ find $LOGDIR/nuclei.txt -size 0 -print -delete > /dev/null
 
 ## Finish
 
-echo "[$DOMAIN] [$(date "+%d-%m-%y %H:%M")] Finish" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Finish" | notify -silent
