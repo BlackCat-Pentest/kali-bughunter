@@ -44,15 +44,30 @@ echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS enumeration found $(cat $LOGD
 
 find $LOGDIR/dns.txt -size 0 -print -delete > /dev/null
 
-## Gau/WaybackURLs
+## Gau
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau and Waybackurls Starting" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau Starting"
+gau $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
 
-gau $DOMAIN | anew $LOGDIR/links.txt > /dev/null
-waybackurls $DOMAIN | anew $LOGDIR/links.txt > /dev/null
+## WaybackURLs
+
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Waybackurls Starting"
+waybackurls $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
+
+## Hakrawler
+
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Hakrawler Starting"
+
+echo "https://$DOMAIN" | \
+  hakrawler -d 99 -u | \
+  egrep "https://$DOMAIN|http://$DOMAIN" | \
+  egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
+  anew $LOGDIR/links.txt &> /dev/null
+
+## Links
+
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs and Hakrawler found $(cat $LOGDIR/links.txt | wc -l) links"
 find $LOGDIR/links.txt -size 0 -print -delete > /dev/null
-
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau and Waybackurls found $(cat $LOGDIR/links.txt | wc -l) links" | notify -silent
 
 ## HTTPX
 
