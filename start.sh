@@ -12,10 +12,13 @@ echo "                                    __/ |                                "
 echo "                                   |___/                 Raphael Sander  ";
 echo ""
 
+## Result Folder
+
 LOGDIR="/results/$DOMAIN"
 mkdir -p $LOGDIR
 
 ## Notify Configuration
+
 mkdir -p /root/.config/notify/
 
 cat << EOF > /root/.config/notify/provider-config.yaml
