@@ -29,11 +29,11 @@ telegram:
     telegram_format: "{{data}}"
 EOF
 
-echo "[$(date "+%d-%m-%y %H:%M:%S")] [$DOMAIN] Starting Automation" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Automation"
 
 ## DNS Enumeration
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS Enumeration Starting" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS Enumeration Starting"
 
 if $DNS_BRUTE
 then
@@ -43,7 +43,7 @@ fi
 theHarvester -d $DOMAIN -s -v -r -n -c | grep "$DOMAIN" | cut -d":" -f1 | anew $LOGDIR/dns.txt > /dev/null
 subfinder -d $DOMAIN -silent | anew $LOGDIR/dns.txt > /dev/null
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS enumeration found $(cat $LOGDIR/dns.txt | wc -l) subdomains" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS enumeration found $(cat $LOGDIR/dns.txt | wc -l) subdomains"
 
 find $LOGDIR/dns.txt -size 0 -print -delete > /dev/null
 
@@ -80,16 +80,16 @@ cat $LOGDIR/dns.txt | httpx -silent | anew $LOGDIR/http_and_https.txt > /dev/nul
 
 if $GOOP
 then
-  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Git Exposed with Goop" | notify -silent
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Git Exposed with Goop"
 
   mkdir -p $LOGDIR/goop && cd $LOGDIR/goop
-  cat $LOGDIR/http_and_https.txt | cut -d"/" -f3 | xargs -I@ sh -c 'goop @' > /dev/null
-  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Goop found $(ls -1 $LOGDIR/goop | wc -l) probable repositories" | notify -silent
+  cat $LOGDIR/http_and_https.txt | cut -d"/" -f3 | xargs -I@ sh -c 'goop @' &> /dev/null
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Goop found $(ls -1 $LOGDIR/goop | wc -l) probable repositories"
 fi
 
 ## Nuclei
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Nuclei" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Nuclei"
 
 nuclei -list $LOGDIR/links.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent | notify -silent |& tee -a $LOGDIR/nuclei.txt
 nuclei -list $LOGDIR/http_and_https.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent | notify -silent |& tee -a $LOGDIR/nuclei.txt
@@ -97,4 +97,4 @@ find $LOGDIR/nuclei.txt -size 0 -print -delete > /dev/null
 
 ## Finish
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Finish" | notify -silent
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Finish"
