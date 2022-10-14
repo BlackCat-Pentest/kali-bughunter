@@ -57,6 +57,17 @@ gau $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Waybackurls Starting"
 waybackurls $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
 
+## GoSpider
+
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] GoSpider Starting"
+
+gospider -s "https://$DOMAIN" -c 10 -d 0 -k 1 -q --sitemap -a | \
+  grep -v "aws-s3" | \
+  sed "s/\[url\] - \[code-200\] - //g" | \
+  egrep "https://$DOMAIN|http://$DOMAIN" | \
+  egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
+  anew $LOGDIR/links.txt &> /dev/null
+
 ## Hakrawler
 
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Hakrawler Starting"
@@ -69,7 +80,7 @@ echo "https://$DOMAIN" | \
 
 ## Links
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs and Hakrawler found $(cat $LOGDIR/links.txt | wc -l) links"
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs, Hakrawler and GoSpider found $(cat $LOGDIR/links.txt | wc -l) links"
 find $LOGDIR/links.txt -size 0 -print -delete > /dev/null
 
 ## HTTPX
