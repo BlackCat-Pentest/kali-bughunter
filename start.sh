@@ -73,7 +73,7 @@ gospider -s "https://$DOMAIN" -c 10 -d 0 -k 1 -q --sitemap -a | \
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Hakrawler Starting"
 
 echo "https://$DOMAIN" | \
-  hakrawler -d 99 -u | \
+  hakrawler -d 99 -u -t 1 | \
   egrep "https://$DOMAIN|http://$DOMAIN" | \
   egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
   anew $LOGDIR/links.txt &> /dev/null
