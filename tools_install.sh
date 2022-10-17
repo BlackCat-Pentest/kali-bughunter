@@ -58,7 +58,14 @@ go install github.com/tomnomnom/hacks/kxss@latest
 go install github.com/003random/getJS@latest
 go install github.com/hakluke/hakrevdns@latest
 
-# Clean Cache
+## install patterns into gf
+mkdir /root/.gf
+cp /tmp/go/pkg/mod/github.com/tomnomnom/$(ls /tmp/go/pkg/mod/github.com/tomnomnom/ | grep "gf@")/examples/* /root/.gf/
+
+cd /tmp && git clone https://github.com/1ndianl33t/Gf-Patterns
+mv /tmp/Gf-Patterns/*.json ~/.gf
+
+# clean cache
 go clean --cache
 rm -rf /tmp/*
 rm -rf /root/.cache/*
