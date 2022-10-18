@@ -83,6 +83,22 @@ echo "https://$DOMAIN" | \
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs, Hakrawler and GoSpider found $(cat $LOGDIR/links.txt | wc -l) links"
 find $LOGDIR/links.txt -size 0 -print -delete > /dev/null
 
+## Open Redirect
+ 
+cat $LOGDIR/links.txt | \
+  grep -a -i \=http | \
+  qsreplace 'http://evil.com' | \
+  while read host
+  do
+    curl -s -L $host -I | \
+      grep "evil.com" -q && \
+      echo "[$(date "+%Y-%m-%d %H:%M:%S")] [open-redirect] [http] [low] $host" |& \
+      tee -a $LOGDIR/open-redirect.txt | \
+      notify -silent
+  done
+
+find $LOGDIR/open-redirect.txt -size 0 -print -delete > /dev/null
+
 ## HTTPX
 
 cat $LOGDIR/dns.txt | httpx -silent | anew $LOGDIR/http_and_https.txt > /dev/null
