@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Tools Install
+# tools install
 go env -w GOBIN=/usr/bin/
 go env -w GOPATH=/tmp/go/
 
@@ -70,6 +70,5 @@ go clean --cache
 rm -rf /tmp/*
 rm -rf /root/.cache/*
 
-# Update Nuclei Templates
-
+# update nuclei templates
 nuclei -ut
