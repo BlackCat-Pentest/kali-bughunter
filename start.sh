@@ -121,8 +121,16 @@ fi
 
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Nuclei"
 
-nuclei -list $LOGDIR/links.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent | notify -silent |& tee -a $LOGDIR/nuclei.txt
-nuclei -list $LOGDIR/http_and_https.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent | notify -silent |& tee -a $LOGDIR/nuclei.txt
+nuclei -list $LOGDIR/links.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent |& \
+  tee -a $LOGDIR/nuclei.txt | \
+  grep -v "\[unknown\]" | \
+  notify -silent
+
+nuclei -list $LOGDIR/http_and_https.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent |& \
+  tee -a $LOGDIR/nuclei.txt | \
+  grep -v "\[unknown\]" | \
+  notify -silent
+
 find $LOGDIR/nuclei.txt -size 0 -print -delete > /dev/null
 
 ## Finish
