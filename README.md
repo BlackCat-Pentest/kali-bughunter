@@ -70,6 +70,8 @@ This project is about of a develop of a container with some tools and scripts to
 | GOOP              | bool (true \| false) | true                                          |
 | DNS_BRUTE         | bool (true \| false) | false                                         |
 | NUCLEI_RATE_LIMIT | int                  | 100                                           |
+| HAKRAWLER         | bool (true \| false) | true                                          |
+| GOSPIDER          | bool (true \| false) | true                                          |
 
 ## Building
 
@@ -145,7 +147,8 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
  ┗ 📂<DOMAIN>
    ┣ 📂goop (Git Exposed with goop)
    ┣ 📜dns.txt (All subdomains found)
-   ┗ 📜http_and_https.txt (All subdomains with HTTP [:80] and HTTPS [:443] accessible)
+   ┣ 📜http_and_https.txt (All subdomains with HTTP [:80] and HTTPS [:443] accessible)
+   ┗ 📜open-redirect.txt (All possible open redirect found)
 📂wordlists
  ┗ 📜dns.txt (Wordlist to DNS brute force)
 📜.gitignore (Files and folder that not be send to the Git repositorie)

@@ -59,14 +59,17 @@ waybackurls $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
 
 ## GoSpider
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] GoSpider Starting"
+if $GOSPIDER
+then
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] GoSpider Starting"
 
-gospider -s "https://$DOMAIN" -c 10 -d 0 -k 1 -q --sitemap -a | \
-  grep -v "aws-s3" | \
-  sed "s/\[url\] - \[code-200\] - //g" | \
-  egrep "https://$DOMAIN|http://$DOMAIN" | \
-  egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
-  anew $LOGDIR/links.txt &> /dev/null
+  gospider -s "https://$DOMAIN" -c 10 -d 0 -k 1 -q --sitemap -a | \
+    grep -v "aws-s3" | \
+    sed "s/\[url\] - \[code-200\] - //g" | \
+    egrep "https://$DOMAIN|http://$DOMAIN" | \
+    egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
+    anew $LOGDIR/links.txt &> /dev/null
+fi
 
 ## Hakrawler
 
