@@ -96,9 +96,9 @@ cat $LOGDIR/links.txt | \
   qsreplace 'http://evil.com' | \
   while read host
   do
-    curl -s -L $host -I | \
+    curl -s -L "$host" -I | \
       grep "evil.com" -q && \
-      echo "[$(date "+%Y-%m-%d %H:%M:%S")] [open-redirect] [http] [low] $host" |& \
+      nuclei -u "$host" -nc -t /root/nuclei-templates/vulnerabilities/generic/open-redirect.yaml -rl $NUCLEI_RATE_LIMIT -silent |& \
       tee -a $LOGDIR/open-redirect.txt | \
       notify -silent
   done
