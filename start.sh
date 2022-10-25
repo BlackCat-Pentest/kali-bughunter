@@ -37,15 +37,15 @@ echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS Enumeration Starting"
 
 if $DNS_BRUTE
 then
-  fierce --domain $DOMAIN --subdomain-file /wordlists/dns.txt | grep Found | awk '{print $2}' | sed 's/.$//' | anew $LOGDIR/dns.txt > /dev/null
+  fierce --domain $DOMAIN --subdomain-file /wordlists/dns.txt | grep Found | awk '{print $2}' | sed 's/.$//' | anew $LOGDIR/dns.txt &> /dev/null
 fi
 
-theHarvester -d $DOMAIN -s -v -r -n -c | grep "$DOMAIN" | cut -d":" -f1 | anew $LOGDIR/dns.txt > /dev/null
-subfinder -d $DOMAIN -silent | anew $LOGDIR/dns.txt > /dev/null
+theHarvester -d $DOMAIN -s -v -r -n -c | grep "$DOMAIN" | cut -d":" -f1 | anew $LOGDIR/dns.txt &> /dev/null
+subfinder -d $DOMAIN -silent | anew $LOGDIR/dns.txt &> /dev/null
 
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS enumeration found $(cat $LOGDIR/dns.txt | wc -l) subdomains"
 
-find $LOGDIR/dns.txt -size 0 -print -delete > /dev/null
+find $LOGDIR/dns.txt -size 0 -print -delete &> /dev/null
 
 ## Gau
 
@@ -87,10 +87,10 @@ fi
 ## Links
 
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs, Hakrawler and GoSpider found $(cat $LOGDIR/links.txt | wc -l) links"
-find $LOGDIR/links.txt -size 0 -print -delete > /dev/null
+find $LOGDIR/links.txt -size 0 -print -delete &> /dev/null
 
 ## Open Redirect
- 
+
 cat $LOGDIR/links.txt | \
   grep -a -i \=http | \
   qsreplace 'http://evil.com' | \
@@ -103,11 +103,11 @@ cat $LOGDIR/links.txt | \
       notify -silent
   done
 
-find $LOGDIR/open-redirect.txt -size 0 -print -delete > /dev/null
+find $LOGDIR/open-redirect.txt -size 0 -print -delete &> /dev/null
 
 ## HTTPX
 
-cat $LOGDIR/dns.txt | httpx -rl 10 -silent | anew $LOGDIR/http_and_https.txt > /dev/null
+cat $LOGDIR/dns.txt | httpx -rl 10 -silent | anew $LOGDIR/http_and_https.txt &> /dev/null
 
 ## Git Exposed
 
@@ -134,7 +134,7 @@ nuclei -list $LOGDIR/http_and_https.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low
   grep -v "\[unknown\]" | \
   notify -silent
 
-find $LOGDIR/nuclei.txt -size 0 -print -delete > /dev/null
+find $LOGDIR/nuclei.txt -size 0 -print -delete &> /dev/null
 
 ## Finish
 
