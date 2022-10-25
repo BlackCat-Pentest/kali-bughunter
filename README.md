@@ -72,6 +72,7 @@ This project is about of a develop of a container with some tools and scripts to
 | NUCLEI_RATE_LIMIT | int                  | 100                                           |
 | HAKRAWLER         | bool (true \| false) | true                                          |
 | GOSPIDER          | bool (true \| false) | true                                          |
+| HTTPX_RATE_LIMIT  | int                  | 90                                            |
 
 ## Building
 

@@ -107,7 +107,7 @@ find $LOGDIR/open-redirect.txt -size 0 -print -delete &> /dev/null
 
 ## HTTPX
 
-cat $LOGDIR/dns.txt | httpx -rl 10 -silent | anew $LOGDIR/http_and_https.txt &> /dev/null
+cat $LOGDIR/dns.txt | httpx -rl $HTTPX_RATE_LIMIT -silent | anew $LOGDIR/http_and_https.txt &> /dev/null
 
 ## Git Exposed
 
