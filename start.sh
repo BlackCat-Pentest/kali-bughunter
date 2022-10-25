@@ -116,7 +116,7 @@ then
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Git Exposed with Goop"
 
   mkdir -p $LOGDIR/goop && cd $LOGDIR/goop
-  cat $LOGDIR/http_and_https.txt | cut -d"/" -f3 | xargs -I@ sh -c 'goop @' &> /dev/null
+  cat $LOGDIR/http_and_https.txt | cut -d"/" -f3 | anew -d goopignore.txt | xargs -I@ sh -c 'goop @' &> /dev/null
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Goop found $(ls -1 $LOGDIR/goop | wc -l) probable repositories"
 fi
 

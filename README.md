@@ -147,6 +147,7 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
 📂results
  ┗ 📂<DOMAIN>
    ┣ 📂goop (Git Exposed with goop)
+   ┃  ┗ 📜goopignore.txt (List of domains to ignore in goop)
    ┣ 📜dns.txt (All subdomains found)
    ┣ 📜http_and_https.txt (All subdomains with HTTP [:80] and HTTPS [:443] accessible)
    ┗ 📜open-redirect.txt (All possible open redirect found)
