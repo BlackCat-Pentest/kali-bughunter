@@ -65,8 +65,8 @@ This project is about of a develop of a container with some tools and scripts to
 | Variables         | Type                 | Example                                       |
 | ----------------- | -------------------- | --------------------------------------------- |
 | DOMAIN            | string               | target.com                                    |
-| TELEGRAM_API_KEY  | string               | 123456789:AAfuq5jTPtd75aolTvTv-mwd9ix23wt7L9k |
-| TELEGRAM_CHAT_ID  | string               | 483230659                                     |
+| TELEGRAM_API_KEY  | string               | 987654321:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r |
+| TELEGRAM_CHAT_ID  | string               | 123456789                                     |
 | GOOP              | bool (true \| false) | true                                          |
 | DNS_BRUTE         | bool (true \| false) | false                                         |
 | NUCLEI_RATE_LIMIT | int                  | 100                                           |
