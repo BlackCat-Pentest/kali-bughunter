@@ -37,7 +37,11 @@ echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS Enumeration Starting"
 
 if $DNS_BRUTE
 then
-  fierce --domain $DOMAIN --subdomain-file /wordlists/dns.txt | grep Found | awk '{print $2}' | sed 's/.$//' | anew $LOGDIR/dns.txt &> /dev/null
+  fierce --domain $DOMAIN --subdomain-file /wordlists/dns.txt 2> /dev/null | \
+    grep Found | \
+    awk '{print $2}' | \
+    sed 's/.$//' | \
+    anew $LOGDIR/dns.txt &> /dev/null
 fi
 
 theHarvester -d $DOMAIN -s -v -r -n -c | grep "$DOMAIN" | cut -d":" -f1 | anew $LOGDIR/dns.txt &> /dev/null
