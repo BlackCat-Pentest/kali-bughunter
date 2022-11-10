@@ -152,6 +152,7 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
    ┣ 📜http_and_https.txt (All subdomains with HTTP [:80] and HTTPS [:443] accessible)
    ┗ 📜open-redirect.txt (All possible open redirect found)
 📂wordlists
+ ┣ 📜chaos-bugbounty-list.json (BugBounty programs)
  ┗ 📜dns.txt (Wordlist to DNS brute force)
 📜.gitignore (Files and folder that not be send to the Git repositorie)
 📜Dockerfile (Instructions to build docker images)
