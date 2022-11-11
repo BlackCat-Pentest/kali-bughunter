@@ -73,6 +73,7 @@ This project is about of a develop of a container with some tools and scripts to
 | HAKRAWLER         | bool (true \| false) | true                                          |
 | GOSPIDER          | bool (true \| false) | true                                          |
 | HTTPX_RATE_LIMIT  | int                  | 90                                            |
+| AKAMAI_FILTER     | bool (true \| false) | false                                         |
 
 ## Building
 
@@ -152,6 +153,8 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
    ┣ 📜http_and_https.txt (All subdomains with HTTP [:80] and HTTPS [:443] accessible)
    ┗ 📜open-redirect.txt (All possible open redirect found)
 📂wordlists
+ ┣ 📜akamai_ipv4_CIDRs.txt (Akamai IPv4 list)
+ ┣ 📜akamai_ipv6_CIDRs.txt (Akamai IPv6 list)
  ┣ 📜chaos-bugbounty-list.json (BugBounty programs)
  ┗ 📜dns.txt (Wordlist to DNS brute force)
 📜.gitignore (Files and folder that not be send to the Git repositorie)

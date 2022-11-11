@@ -12,9 +12,15 @@ echo "                                    __/ |                                "
 echo "                                   |___/                 Raphael Sander  ";
 echo ""
 
-## Result Folder
+## Variables
 
 LOGDIR="/results/$DOMAIN"
+dns_file="$LOGDIR/dns.txt"
+links_file="$LOGDIR/links.txt"
+http_and_https_file="$LOGDIR/http_and_https.txt"
+
+## Result Folder
+
 mkdir -p $LOGDIR
 
 ## Notify Configuration
@@ -28,6 +34,8 @@ telegram:
     telegram_chat_id: "${TELEGRAM_CHAT_ID}"
     telegram_format: "{{data}}"
 EOF
+
+## Starting Automation
 
 echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Automation"
 
@@ -51,51 +59,84 @@ echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] DNS enumeration found $(cat $LOGD
 
 find $LOGDIR/dns.txt -size 0 -print -delete &> /dev/null
 
+## Akamai IP Filter
+
+if $AKAMAI_FILTER
+then
+  dns_file="$LOGDIR/dns_no_akamai.txt"
+  links_file="$LOGDIR/links_no_akamai.txt"
+  http_and_https_file="$LOGDIR/http_and_https_no_akamai.txt"
+
+  for dns in $(cat $LOGDIR/dns.txt)
+  do
+    ipv4_cidrs=$(dig +short $dns | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+    if grepcidr -f wordlists/akamai_ipv4_CIDRs.txt <(echo $ipv4_cidrs) > /dev/null
+    then
+      echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$dns] Akamai IP"
+    else
+      echo $dns | anew $dns_file > /dev/null
+    fi
+  done
+  sleep 2
+fi
+
 ## Gau
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau Starting"
-gau $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
+for dns in $(cat $dns_file)
+do
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$dns] Gau Starting"
+  gau $dns 2> /dev/null | anew $links_file &> /dev/null
+done
 
 ## WaybackURLs
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Waybackurls Starting"
-waybackurls $DOMAIN | anew $LOGDIR/links.txt &> /dev/null
+for dns in $(cat $dns_file)
+do
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Waybackurls Starting"
+  waybackurls $DOMAIN 2> /dev/null | anew $links_file &> /dev/null
+done
 
 ## GoSpider
 
-if $GOSPIDER
-then
-  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] GoSpider Starting"
+for dns in $(cat $dns_file)
+do
+  if $GOSPIDER
+  then
+    echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$dns] GoSpider Starting"
 
-  gospider -s "https://$DOMAIN" -c 10 -d 0 -k 1 -q --sitemap -a | \
-    grep -v "aws-s3" | \
-    sed "s/\[url\] - \[code-200\] - //g" | \
-    egrep "https://$DOMAIN|http://$DOMAIN" | \
-    egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
-    anew $LOGDIR/links.txt &> /dev/null
-fi
+    gospider -s "https://$dns" -c 10 -d 0 -k 1 -q --sitemap -a 2> /dev/null | \
+      grep -v "aws-s3" | \
+      sed "s/\[url\] - \[code-200\] - //g" | \
+      egrep "https://$dns|http://$dns" | \
+      egrep -v "=https://$dns|=http://$dns" | \
+      anew $links_file &> /dev/null
+  fi
+done
 
 ## Hakrawler
 
-if $HAKRAWLER
-then
-  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Hakrawler Starting"
+for dns in $(cat $dns_file)
+do
+  if $HAKRAWLER
+  then
+    echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$dns] Hakrawler Starting"
 
-  echo "https://$DOMAIN" | \
-    hakrawler -d 99 -u -t 1 | \
-    egrep "https://$DOMAIN|http://$DOMAIN" | \
-    egrep -v "=https://$DOMAIN|=http://$DOMAIN" | \
-    anew $LOGDIR/links.txt &> /dev/null
-fi
+    echo "https://$dns" | \
+      hakrawler -d 99 -u -t 1 2> /dev/null | \
+      egrep "https://$dns|http://$dns" | \
+      egrep -v "=https://$dns|=http://$dns" | \
+      anew $links_file &> /dev/null
+  fi
+done
 
 ## Links
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs, Hakrawler and GoSpider found $(cat $LOGDIR/links.txt | wc -l) links"
-find $LOGDIR/links.txt -size 0 -print -delete &> /dev/null
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Gau, WaybackURLs, Hakrawler and GoSpider found $(cat $links_file | wc -l) links"
+find $links_file -size 0 -print -delete &> /dev/null
 
 ## Open Redirect
 
-cat $LOGDIR/links.txt | \
+cat $links_file | \
   grep -a -i \=http | \
   qsreplace 'http://evil.com' | \
   while read host
@@ -111,7 +152,7 @@ find $LOGDIR/open-redirect.txt -size 0 -print -delete &> /dev/null
 
 ## HTTPX
 
-cat $LOGDIR/dns.txt | httpx -rl $HTTPX_RATE_LIMIT -silent | anew $LOGDIR/http_and_https.txt &> /dev/null
+cat $dns_file | httpx -rl $HTTPX_RATE_LIMIT -silent 2> /dev/null | anew $http_and_https_file &> /dev/null
 
 ## Git Exposed
 
@@ -120,25 +161,28 @@ then
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Git Exposed with Goop"
 
   mkdir -p $LOGDIR/goop && cd $LOGDIR/goop
-  cat $LOGDIR/http_and_https.txt | cut -d"/" -f3 | anew -d goopignore.txt | xargs -I@ sh -c 'goop @' &> /dev/null
+  cat $http_and_https_file | cut -d"/" -f3 | anew -d goopignore.txt | xargs -I@ sh -c 'goop @' &> /dev/null
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Goop found $(ls -1 $LOGDIR/goop | wc -l) probable repositories"
 fi
 
 ## Nuclei
 
-echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Nuclei"
+if $NUCLEI_FULL
+then
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Starting Nuclei"
 
-nuclei -list $LOGDIR/links.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent |& \
-  tee -a $LOGDIR/nuclei.txt | \
-  grep -v "\[unknown\]" | \
-  notify -silent
+  nuclei -list $links_file -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent |& \
+    tee -a $LOGDIR/nuclei.txt | \
+    grep -v "\[unknown\]" | \
+    notify -silent
 
-nuclei -list $LOGDIR/http_and_https.txt -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent |& \
-  tee -a $LOGDIR/nuclei.txt | \
-  grep -v "\[unknown\]" | \
-  notify -silent
+  nuclei -list $http_and_https_file -nc -rl $NUCLEI_RATE_LIMIT -severity low,medium,high,critical,unknown -silent |& \
+    tee -a $LOGDIR/nuclei.txt | \
+    grep -v "\[unknown\]" | \
+    notify -silent
 
-find $LOGDIR/nuclei.txt -size 0 -print -delete &> /dev/null
+  find $LOGDIR/nuclei.txt -size 0 -print -delete &> /dev/null
+fi
 
 ## Finish
 
