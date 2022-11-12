@@ -137,16 +137,9 @@ find $links_file -size 0 -print -delete &> /dev/null
 ## Open Redirect
 
 cat $links_file | \
-  grep -a -i \=http | \
-  qsreplace 'http://evil.com' | \
-  while read host
-  do
-    curl -s -L "$host" -I | \
-      grep "evil.com" -q && \
-      nuclei -u "$host" -nc -t /root/nuclei-templates/vulnerabilities/generic/open-redirect.yaml -rl $NUCLEI_RATE_LIMIT -silent |& \
-      tee -a $LOGDIR/open-redirect.txt | \
-      notify -silent
-  done
+  nuclei -nc -t /root/nuclei-templates/vulnerabilities/generic/open-redirect.yaml -rl $NUCLEI_RATE_LIMIT -silent 2> /dev/null |& \
+  tee -a $LOGDIR/open-redirect.txt | \
+  notify -silent
 
 find $LOGDIR/open-redirect.txt -size 0 -print -delete &> /dev/null
 
