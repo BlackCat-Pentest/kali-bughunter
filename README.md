@@ -163,3 +163,22 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
 📜start.sh (Entrypoint script that run when start the kali-bughunter container)
 📜tools_install.sh (Script to install the all tools into the kali-bughunter image in the build)
 ```
+
+## Wordlists Origin
+
+### Akamai
+
+Information: <https://techdocs.akamai.com/property-mgr/docs/origin-ip-access-control>  
+File: <https://techdocs.akamai.com/property-manager/pdfs/akamai_ipv4_ipv6_CIDRs-txt.zip>
+
+### DNS
+
+<https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/bitquark-subdomains-top100000.txt>
+
+### Chaos BugBounty
+
+<https://raw.githubusercontent.com/projectdiscovery/public-bugbounty-programs/master/chaos-bugbounty-list.json>
+
+### DNS Resolvers
+
+<https://public-dns.info/nameservers.txt>
