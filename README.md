@@ -62,18 +62,19 @@ This project is about of a develop of a container with some tools and scripts to
 
 ## Environments Variables
 
-| Variables         | Type                 | Example                                       |
-| ----------------- | -------------------- | --------------------------------------------- |
-| DOMAIN            | string               | target.com                                    |
-| TELEGRAM_API_KEY  | string               | 987654321:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r |
-| TELEGRAM_CHAT_ID  | string               | 123456789                                     |
-| GOOP              | bool (true \| false) | true                                          |
-| DNS_BRUTE         | bool (true \| false) | false                                         |
-| NUCLEI_RATE_LIMIT | int                  | 100                                           |
-| HAKRAWLER         | bool (true \| false) | true                                          |
-| GOSPIDER          | bool (true \| false) | true                                          |
-| HTTPX_RATE_LIMIT  | int                  | 90                                            |
-| AKAMAI_FILTER     | bool (true \| false) | false                                         |
+| Variables         | Type                  | Example                                       |
+| ----------------- | --------------------- | --------------------------------------------- |
+| DOMAIN            | string                | target.com                                    |
+| TELEGRAM_API_KEY  | string                | 987654321:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r |
+| TELEGRAM_CHAT_ID  | string                | 123456789                                     |
+| GOOP              | bool (true \| false)  | true                                          |
+| DNS_BRUTE         | bool (true \| false)  | false                                         |
+| NUCLEI_RATE_LIMIT | int                   | 100                                           |
+| HAKRAWLER         | bool (true \| false)  | true                                          |
+| GOSPIDER          | bool (true \| false)  | true                                          |
+| HTTPX_RATE_LIMIT  | int                   | 90                                            |
+| AKAMAI_FILTER     | bool (true \| false)  | false                                         |
+| NUCLEI_FULL       | bool (true \| false ) | true                                          |
 
 ## Building
 
@@ -136,8 +137,13 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
     -e TELEGRAM_API_KEY=<TELEGRAM_API_KEY> \
     -e TELEGRAM_CHAT_ID=<TELEGRAM_CHAT_ID> \
     -e GOOP=false \
-    -e DNS_BRUTE=true \
-    -e NUCLEI_RATE_LIMIT=150 \
+    -e DNS_BRUTE=false \
+    -e NUCLEI_RATE_LIMIT=5 \
+    -e HAKRAWLER=false \
+    -e GOSPIDER=false \
+    -e HTTPX_RATE_LIMIT=10 \
+    -e AKAMAI_FILTER=true \
+    -e NUCLEI_FULL=false \
     kali-bughunter'
 ```
 
