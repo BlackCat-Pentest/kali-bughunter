@@ -92,7 +92,7 @@ done
 
 for dns in $(cat $dns_file)
 do
-  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Waybackurls Starting"
+  echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$dns] Waybackurls Starting"
   waybackurls $DOMAIN 2> /dev/null | anew $links_file &> /dev/null
 done
 
