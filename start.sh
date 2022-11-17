@@ -136,6 +136,7 @@ find $links_file -size 0 -print -delete &> /dev/null
 
 ## Open Redirect
 
+echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$DOMAIN] Open Redirect Starting"
 cat $links_file | \
   nuclei -nc -t /root/nuclei-templates/vulnerabilities/generic/open-redirect.yaml -rl $NUCLEI_RATE_LIMIT -silent 2> /dev/null |& \
   tee -a $LOGDIR/open-redirect.txt | \
