@@ -2,7 +2,7 @@ FROM kalilinux/kali-rolling
 
 RUN apt update && \
     apt upgrade -y && \
-    apt install ca-certificates curl git jq dnsutils golang fierce theharvester grepcidr -y && \
+    apt install ca-certificates curl git make jq dnsutils golang fierce theharvester grepcidr -y && \
     rm -rf /var/lib/apt/lists/*
 
 COPY tools_install.sh /tmp

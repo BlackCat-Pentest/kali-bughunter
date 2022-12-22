@@ -58,6 +58,13 @@ go install github.com/tomnomnom/hacks/kxss@latest
 go install github.com/003random/getJS@latest
 go install github.com/hakluke/hakrevdns@latest
 
+## install massdns
+### puredns prerequisites
+git clone https://github.com/blechschmidt/massdns.git /tmp/massdns
+cd /tmp/massdns
+make
+make install
+
 ## install patterns into gf
 mkdir /root/.gf
 cp /tmp/go/pkg/mod/github.com/tomnomnom/$(ls /tmp/go/pkg/mod/github.com/tomnomnom/ | grep "gf@")/examples/* /root/.gf/
