@@ -162,7 +162,9 @@ cat chaos-bugbounty-list.json | jq -r '.programs[] | select(.bounty==true) | .do
  ┣ 📜akamai_ipv4_CIDRs.txt (Akamai IPv4 list)
  ┣ 📜akamai_ipv6_CIDRs.txt (Akamai IPv6 list)
  ┣ 📜chaos-bugbounty-list.json (BugBounty programs)
- ┗ 📜dns.txt (Wordlist to DNS brute force)
+ ┣ 📜dns.txt (Wordlist to DNS brute force)
+ ┗ 📜resolvers.txt (Resolvers to DNS brute force)
+ 
 📜.gitignore (Files and folder that not be send to the Git repositorie)
 📜Dockerfile (Instructions to build docker images)
 📜README.md (This documentation)
@@ -188,3 +190,4 @@ File: <https://techdocs.akamai.com/property-manager/pdfs/akamai_ipv4_ipv6_CIDRs-
 ### DNS Resolvers
 
 <https://public-dns.info/nameservers.txt>
+<https://github.com/TheRook/subbrute>
