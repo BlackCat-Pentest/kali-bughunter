@@ -1,0 +1,2 @@
+pymongo==4.3.3
+tldextract==3.4.0
