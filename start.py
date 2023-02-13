@@ -264,6 +264,119 @@ def dnsx(domain):
     print(datetime.datetime.now().strftime("%Y/%m/%dT%H:%M:%S"), f"dnsx resolve {subdomain_dnsx_sum} subdomains")
 
 
+def katana(domain):
+
+    print(datetime.datetime.now().strftime("%Y/%m/%dT%H:%M:%S"), "starting katana")
+
+    subdomains = db.subdomains.find({"domain": domain})
+
+    subdomain_list = ""
+    httpx_input = ""
+    
+    ports = "80,443,81,300,591,593,832,981,1010,1311,1099,2082,2095,2096,2480,3000,3128,3333,4243,4567,4711,4712,4993,5000,5104,5108,5280,5281,5601,5800,6543,7000,7001,7396,7474,8000,8001,8008,8014,8042,8060,8069,8080,8081,8083,8088,8090,8091,8095,8118,8123,8172,8181,8222,8243,8280,8281,8333,8337,8443,8500,8834,8880,8888,8983,9000,9001,9043,9060,9080,9090,9091,9200,9443,9502,9800,9981,10000,10250,11371,12443,15672,16080,17778,18091,18092,20720,32000,55440,55672"
+    
+    for subdomain in subdomains:
+        subdomain_list = subdomain_list + "\n" + subdomain['subdomain']
+
+    command = subprocess.run(["naabu", "-silent", "-p", ports, "-json"], capture_output=True, text=True, input=subdomain_list)
+
+    lines = command.stdout.strip().split("\n")
+
+    for line in lines:
+        naabu_json = json.loads(line)
+
+        host = naabu_json['host']
+        port = naabu_json['port']
+
+        httpx_input = f"{httpx_input}{host}:{port}\n" 
+
+    command = subprocess.run(["httpx", "-silent", "-json"], capture_output=True, text=True, input=httpx_input)
+    lines = command.stdout.strip().split("\n")
+
+    katana_input = ""
+
+    for line in lines:
+        url_json = json.loads(line)
+        
+        url = url_json['url']
+        status_code = url_json['status-code']
+        if "webserver" in url_json:
+            webserver = url_json['webserver']
+        else:
+            webserver = "null"
+        
+        extract = tldextract.extract(url)
+        domain_extract = extract.registered_domain
+        subdomain_extract = '.'.join(part for part in extract if part)
+
+        db.urls.update_one(
+            {
+                "url": url
+            },
+            {
+                "$set": {
+                    "url": url,
+                    "status_code": status_code,
+                    "webserver": webserver,
+                    "subdomain": subdomain_extract,
+                    "domain": domain_extract
+                },
+                "$addToSet": {
+                    "source": "httpx"
+                }
+            },
+            upsert=True
+        )
+
+        katana_input = f"{katana_input}{url}\n"
+    
+    command = subprocess.run(["katana", "-d", "20", "-jc", "-kf", "robotstxt,sitemapxml", "-rl", "10", "-json"], capture_output=True, text=True, input=katana_input)
+    lines = command.stdout.strip().split("\n")
+    
+    for line in lines:
+        url_json = json.loads(line)
+        
+        url = url_json['endpoint']
+
+        extract = tldextract.extract(url)
+        domain_extract = extract.registered_domain
+        subdomain_extract = '.'.join(part for part in extract if part)
+
+        db.urls.update_one(
+            {
+                "url": url
+            },
+            {
+                "$set": {
+                    "url": url,
+                    "domain": domain_extract,
+                    "subdomain": subdomain_extract
+                },
+                "$addToSet": {
+                    "source": "katana"
+                }
+            },
+            upsert=True
+        )
+    
+    db.tasks.update_one(
+        {
+            "domain": domain
+        },
+        {
+            "$set": {
+                "domain": domain
+            },
+            "$addToSet": {
+                "done": "katana"
+            }
+        },
+        upsert=True
+    )
+    
+    print(datetime.datetime.now().strftime("%Y/%m/%dT%H:%M:%S"), f"katana finish")
+
+
 if __name__ == '__main__':
 
     db = db_connection()
@@ -288,3 +401,6 @@ if __name__ == '__main__':
         
         if "dnsx" not in done:
             dnsx(domain)
+
+        if "katana" not in done:
+            katana(domain)
